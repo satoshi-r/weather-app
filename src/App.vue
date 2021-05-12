@@ -60,7 +60,6 @@
 
 <script>
 import api from "./api";
-import ip from "ip";
 
 export default {
   name: "App",
@@ -226,30 +225,13 @@ export default {
     },
 
     setLocation() {
-      const url =
-        "https://suggestions.dadata.ru/suggestions/api/4_1/rs/iplocate/address?ip=";
-      const token = "5258659d61d595f815d120c5f2677c3675375b86";
-      const query =
-        process.env.NODE_ENV == "development" ? "5.3.212.179" : ip.address();
-
-      const options = {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: "Token " + token,
-        },
-      };
-
-      fetch(url + query, options)
-        .then((response) => response.text())
-        .then((result) => {
-          const exchangeData = JSON.parse(result);
-          this.location.country = exchangeData.location.data.country;
-          this.location.city = exchangeData.location.data.city;
-        })
-        .catch((error) => console.log("error", error));
+      api.getLocation().then((data) => {
+        this.location.country = data.location.data.country;
+        this.location.city = data.location.data.city;
+      })
+      .catch(err => {
+        console.log(err);
+      });
     },
   },
 };
