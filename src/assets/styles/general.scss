@@ -1,0 +1,11 @@
+@import "bootstrap/scss/bootstrap-reboot.scss";
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
+
+#app {
+    font-family: 'Rubik', sans-serif;
+    font-size: 24px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #ffffff;
+}
