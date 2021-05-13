@@ -25,7 +25,12 @@
       </div>
     </transition>
     <div class="background">
-      <img src="./assets/images/night-rain.jpg" alt="bg" />
+      <img
+        :src="
+          require(`@/assets/images/${background || 'day-clouds'}.jpg`)
+        "
+        alt="bg"
+      />
     </div>
 
     <section class="main">
@@ -105,6 +110,7 @@ export default {
         },
         icon: null,
       },
+      background: null,
       forecast: [],
       conditions: {
         Ясно: "Clear",
@@ -230,6 +236,7 @@ export default {
         }
       }
 
+      this.setBackground();
       this.loading = false;
     },
 
@@ -309,6 +316,13 @@ export default {
           icon: getIcon(obj.weather[0]),
         });
       });
+    },
+
+    setBackground() {
+      this.background = `${this.timesOfDay}-${this.weather.description.en
+        .toLowerCase()
+        .split(" ")
+        .join("-")}`;
     },
   },
 };
