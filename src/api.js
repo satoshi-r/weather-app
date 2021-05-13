@@ -11,6 +11,16 @@ class Api {
         }
     }
 
+    async getForecastWeather(lat, lon) {
+        try {
+            const data = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${process.env.VUE_APP_API_CURRENT_WEATHER}&units=metric`);
+            return data.json();
+        } catch (error) {
+            console.error(error);
+            alert('Ошибка загрузки. Попробуйте обновить страницу');
+        }
+    }
+
     getLocation() {
         return new Promise((resolve, reject) => {
             const url =

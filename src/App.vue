@@ -54,6 +54,21 @@
         />
         <div class="current-description">{{ weather.description.ru }}</div>
       </div>
+
+      <div class="forecast">
+        <div v-for="item of forecast" :key="item" class="forecast-item">
+          <div class="forecast-item-day">{{ item.number }}, {{ item.day }}</div>
+          <img
+            :src="
+              require(`@/assets/images/icons/${item.icon ||
+                'broken-clouds'}.svg`)
+            "
+            class="forecast-item-icon"
+            alt="icon"
+          />
+          <div class="forecast-item-temp">{{ item.temp }}&deg;C</div>
+        </div>
+      </div>
     </section>
   </div>
 </template>
@@ -69,6 +84,10 @@ export default {
       loading: true,
       time: "",
       timesOfDay: "",
+      coords: {
+        lat: null,
+        lon: null,
+      },
       date: {
         number: null,
         day: null,
@@ -86,6 +105,7 @@ export default {
         },
         icon: null,
       },
+      forecast: [],
       conditions: {
         Ясно: "Clear",
         Гроза: "Thunderstorm",
@@ -105,6 +125,15 @@ export default {
           "Tornado",
         ],
       },
+      days: [
+        "Воскресенье",
+        "Понедельник",
+        "Вторник",
+        "Среда",
+        "Четверг",
+        "Пятница",
+        "Суббота",
+      ],
     };
   },
 
@@ -115,7 +144,6 @@ export default {
     }, 1000);
 
     this.setTimesOfDay();
-    this.setCurrentWeather();
     this.setLocation();
   },
 
@@ -126,15 +154,6 @@ export default {
     },
 
     setDate() {
-      const days = [
-        "Воскресенье",
-        "Понедельник",
-        "Вторник",
-        "Среда",
-        "Четверг",
-        "Пятница",
-        "Суббота",
-      ];
       const months = [
         "Января",
         "Февраля",
@@ -151,7 +170,7 @@ export default {
       ];
       const date = new Date();
       this.date.number = date.getDate();
-      this.date.day = days[date.getDay()];
+      this.date.day = this.days[date.getDay()];
       this.date.month = months[date.getMonth()];
     },
 
@@ -161,27 +180,17 @@ export default {
       if (hours >= 22 || hours <= 5) this.timesOfDay = "night";
     },
 
-    setCurrentWeather() {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const data = await api.getCurrentWeather(
-            pos.coords.latitude,
-            pos.coords.longitude
-          );
-          this.weather.temp = parseInt(data.main.temp);
-          this.setCondition(data.weather[0]);
-          console.log(data);
-        },
-
-        (error) => {
-          alert("Пожалуйста, включите геолокацию");
-          console.error(error.message);
-          this.setCurrentWeather();
-        }
+    async setCurrentWeather() {
+      const data = await api.getCurrentWeather(
+        this.coords.lat,
+        this.coords.lon
       );
+
+      this.weather.temp = parseInt(data.main.temp);
+      this.setCondition(data.weather[0]);
     },
 
-    setCondition(data) {
+    setCondition({ main, description }) {
       this.weather.icon = null;
       const descriptions = {
         "few clouds": "Малооблачно",
@@ -193,13 +202,21 @@ export default {
       for (const key in this.conditions) {
         const filteredDescription =
           Array.isArray(this.conditions[key]) &&
-          this.conditions[key].filter((item) => item == data.main)[0];
+          this.conditions[key].filter((item) => item == main)[0];
 
-        if (data.main == this.conditions[key] || filteredDescription) {
+        if (main == this.conditions[key] || filteredDescription) {
           this.weather.description.ru = key;
 
+          this.weather.description.en = Array.isArray(this.conditions[key])
+            ? "Mist"
+            : this.conditions[key];
+
+          this.weather.icon = `${
+            this.timesOfDay
+          }-${this.weather.description.en.toLowerCase()}`;
+
           for (const desc in descriptions) {
-            if (data.description == desc) {
+            if (description == desc) {
               this.weather.description.ru = descriptions[desc];
               if (desc == "few clouds") {
                 this.weather.icon = `${this.timesOfDay}-${desc
@@ -210,14 +227,6 @@ export default {
               }
             }
           }
-
-          this.weather.description.en = Array.isArray(this.conditions[key])
-            ? "Mist"
-            : this.conditions[key];
-
-          this.weather.icon = `${
-            this.timesOfDay
-          }-${this.weather.description.en.toLowerCase()}`;
         }
       }
 
@@ -225,12 +234,80 @@ export default {
     },
 
     setLocation() {
-      api.getLocation().then((data) => {
-        this.location.country = data.location.data.country;
-        this.location.city = data.location.data.city;
-      })
-      .catch(err => {
-        console.log(err);
+      api
+        .getLocation()
+        .then((data) => {
+          this.location.country = data.location.data.country;
+          this.location.city = data.location.data.city;
+          this.coords.lat = data.location.data.geo_lat;
+          this.coords.lon = data.location.data.geo_lon;
+          this.setCurrentWeather();
+          this.setForecastWeather();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    async setForecastWeather() {
+      const data = await api.getForecastWeather(
+        this.coords.lat,
+        this.coords.lon
+      );
+
+      const list = [];
+      data.list.forEach((obj) => {
+        if (obj.dt_txt.includes("15:00:00")) {
+          list.push(obj);
+        }
+      });
+      console.log(list);
+
+      const getIcon = ({ main, description }) => {
+        let result;
+        const descriptions = {
+          "few clouds": "Малооблачно",
+          "scattered clouds": "Облачно",
+          "broken clouds": "Пасмурно",
+          "overcast clouds": "Пасмурно",
+        };
+
+        for (const key in this.conditions) {
+          let condition;
+          const filteredDescription =
+            Array.isArray(this.conditions[key]) &&
+            this.conditions[key].filter((item) => item == main)[0];
+
+          if (main == this.conditions[key] || filteredDescription) {
+            condition = Array.isArray(this.conditions[key])
+              ? "Mist"
+              : this.conditions[key];
+
+            result = `day-${condition.toLowerCase()}`;
+
+            for (const desc in descriptions) {
+              if (description == desc) {
+                if (desc == "few clouds") {
+                  result = `day-${desc.split(" ").join("-")}`;
+                } else {
+                  result = `${desc.split(" ").join("-")}`;
+                }
+              }
+            }
+          }
+        }
+
+        return result;
+      };
+
+      list.forEach((obj) => {
+        const date = new Date(obj.dt * 1000);
+        this.forecast.push({
+          temp: parseInt(obj.main.temp),
+          number: date.getDate(),
+          day: this.days[date.getDay()],
+          icon: getIcon(obj.weather[0]),
+        });
       });
     },
   },
