@@ -23,7 +23,7 @@ class Api {
         return new Promise((resolve, reject) => {
             const url =
                 "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address";
-            const token = process.env.VUE_APP_API_GET_IP;
+            const token = process.env.VUE_APP_API_GET_LOCATION;
             const query = {lat, lon};
 
             const options = {
