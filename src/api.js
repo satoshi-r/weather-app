@@ -1,5 +1,6 @@
 import ip from "ip";
 
+console.log(ip);
 class Api {
     async getCurrentWeather(lat, lon) {
         try {
