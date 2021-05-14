@@ -1,6 +1,4 @@
 import ip from "ip";
-
-console.log(ip);
 class Api {
     async getCurrentWeather(lat, lon) {
         try {
@@ -29,6 +27,7 @@ class Api {
             const token = process.env.VUE_APP_API_GET_IP;
             const query =
                 process.env.NODE_ENV == "development" ? "5.3.212.179" : ip.address();
+            console.log(query);
 
             const options = {
                 method: "GET",
