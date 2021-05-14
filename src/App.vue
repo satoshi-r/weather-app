@@ -26,9 +26,7 @@
     </transition>
     <div class="background">
       <img
-        :src="
-          require(`@/assets/images/${background || 'day-clouds'}.jpg`)
-        "
+        :src="require(`@/assets/images/${background || 'day-clouds'}.jpg`)"
         alt="bg"
       />
     </div>
@@ -241,19 +239,28 @@ export default {
     },
 
     setLocation() {
-      api
-        .getLocation()
-        .then((data) => {
-          this.location.country = data.location.data.country;
-          this.location.city = data.location.data.city;
-          this.coords.lat = data.location.data.geo_lat;
-          this.coords.lon = data.location.data.geo_lon;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          api
+            .getLocation(pos.coords.latitude, pos.coords.longitude)
+            .then((data) => {
+              this.location.country = data.country;
+              this.location.city = data.city;
+              this.coords.lat = data.geo_lat;
+              this.coords.lon = data.geo_lon;
+              this.setCurrentWeather();
+              this.setForecastWeather();
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        },
+        (error) => {
+          alert("Пожалуйста, включите геолокацию");
+          console.error(error.message);
           this.setCurrentWeather();
-          this.setForecastWeather();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        }
+      );
     },
 
     async setForecastWeather() {
@@ -268,7 +275,6 @@ export default {
           list.push(obj);
         }
       });
-      console.log(list);
 
       const getIcon = ({ main, description }) => {
         let result;

@@ -10,7 +10,6 @@
   "dependencies": {
     "bootstrap": "^5.0.0",
     "core-js": "^3.6.5",
-    "ip": "^1.1.5",
     "vue": "^3.0.0"
   },
   "devDependencies": {

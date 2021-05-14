@@ -1,4 +1,3 @@
-import ip from "ip";
 class Api {
     async getCurrentWeather(lat, lon) {
         try {
@@ -20,30 +19,27 @@ class Api {
         }
     }
 
-    getLocation() {
+    getLocation(lat, lon) {
         return new Promise((resolve, reject) => {
             const url =
-                "https://suggestions.dadata.ru/suggestions/api/4_1/rs/iplocate/address?ip=";
+                "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address";
             const token = process.env.VUE_APP_API_GET_IP;
-            const query =
-                process.env.NODE_ENV == "development" ? "5.3.212.179" : ip.address();
-            console.log(query);
+            const query = {lat, lon};
 
             const options = {
-                method: "GET",
-                mode: "cors",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                    Authorization: "Token " + token,
-                },
+                method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": "Token " + token
+                    },
+                    body: JSON.stringify(query)
             };
 
-            fetch(url + query, options)
+            fetch(url, options)
                 .then((response) => response.text())
-                .then((result) => {
-                    resolve(JSON.parse(result));
-                })
+                .then((result) => resolve(JSON.parse(result).suggestions[0].data))
                 .catch((error) => {
                     console.error(error);
                     alert('Ошибка загрузки. Попробуйте обновить страницу');
