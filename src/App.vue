@@ -32,7 +32,7 @@
     </div>
 
     <section class="main">
-      <div class="head">
+      <div class="head" :class="(animate) ? 'fadeIn': ''">
         <div class="head-col">
           <div class="head-time">{{ time }}</div>
           <div class="head-date">
@@ -45,7 +45,7 @@
         </div>
       </div>
 
-      <div class="current">
+      <div class="current" :class="(animate) ? 'fadeIn': ''">
         <div class="current-temp">{{ weather.temp }}&deg;С</div>
         <img
           :src="
@@ -58,7 +58,7 @@
         <div class="current-description">{{ weather.description.ru }}</div>
       </div>
 
-      <div class="forecast">
+      <div class="forecast" :class="(animate) ? 'fadeInUp': ''">
         <div v-for="item of forecast" :key="item" class="forecast-item">
           <div class="forecast-item-day">{{ item.number }}, {{ item.day }}</div>
           <img
@@ -84,6 +84,7 @@ export default {
 
   data() {
     return {
+      animate: false,
       loading: true,
       time: "",
       timesOfDay: "",
@@ -235,7 +236,6 @@ export default {
       }
 
       this.setBackground();
-      this.loading = false;
     },
 
     setLocation() {
@@ -243,16 +243,18 @@ export default {
         (pos) => {
           api
             .getLocation(pos.coords.latitude, pos.coords.longitude)
-            .then((data) => {
+            .then(async (data) => {
               this.location.country = data.country;
               this.location.city = data.city;
               this.coords.lat = data.geo_lat;
               this.coords.lon = data.geo_lon;
-              this.setCurrentWeather();
-              this.setForecastWeather();
+              await this.setCurrentWeather();
+              await this.setForecastWeather();
+              this.loading = false;
             })
             .catch((err) => {
               console.log(err);
+              alert("Ошибка загрузки.");
             });
         },
         (error) => {
@@ -331,5 +333,13 @@ export default {
         .join("-")}`;
     },
   },
+
+  watch: {
+    loading() {
+      setTimeout(() => {
+        this.animate = true;
+      }, 300);
+    }
+  }
 };
 </script>
