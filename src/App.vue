@@ -223,10 +223,8 @@ export default {
           for (const desc in descriptions) {
             if (description == desc) {
               this.weather.description.ru = descriptions[desc];
-              if (desc == "few clouds") {
-                this.weather.icon = `${this.timesOfDay}-${desc
-                  .split(" ")
-                  .join("-")}`;
+              if (desc == "few clouds" || desc == "overcast clouds") {
+                this.weather.icon = `${this.timesOfDay}-few-clouds`;
               } else {
                 this.weather.icon = `${desc.split(" ").join("-")}`;
               }
@@ -302,8 +300,8 @@ export default {
 
             for (const desc in descriptions) {
               if (description == desc) {
-                if (desc == "few clouds") {
-                  result = `day-${desc.split(" ").join("-")}`;
+                if (desc == "few clouds" || desc == "overcast clouds") {
+                  result = `day-few-clouds`;
                 } else {
                   result = `${desc.split(" ").join("-")}`;
                 }

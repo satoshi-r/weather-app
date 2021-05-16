@@ -210,3 +210,153 @@
         }
     }
 }
+
+@media screen and (max-width: 1040px) {
+    .main {
+        padding: 40px;
+    }
+}
+
+@media screen and (max-width: 920px) {
+    .main {
+        padding: 40px;
+
+        .head {
+            &-date,
+            &-country {
+                font-size: 18px;
+            }
+
+            &-time,
+            &-city {
+                font-size: 30px;
+            }
+        }
+
+        .current {
+            &-icon {
+                width: 160px;
+                height: 160px;
+            }
+
+            &-temp {
+                font-size: 48px;
+            }
+
+            &-description {
+                font-size: 18px;
+            }
+        }
+
+        .forecast {
+            &-item {
+                &-day {
+                    font-size: 18px;
+                }
+
+                &-icon {
+                    width: 64px;
+                    height: 64px;
+                }
+
+                &-temp {
+                    font-size: 18px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 840px) {
+    .main {
+        padding: 40px 0;
+
+        .head {
+            padding: 0 40px;
+        }
+
+        .forecast {
+            padding-left: 40px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            z-index: 0;
+            height: 200px;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+
+            &-item {
+                width: 164px;
+                flex-shrink: 0;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 560px) {
+    .main {
+        padding: 16px 0;
+
+        .head {
+            padding: 0 16px;
+
+            &-time,
+            &-city {
+                font-size: 18px;
+            }
+
+            &-date,
+            &-country {
+                font-size: 14px;
+            }
+        }
+
+        .current {
+            &-temp {
+                font-size: 36px;
+            }
+
+            &-icon {
+                width: 120px;
+                height: 120px;
+            }
+
+            &-description {
+                font-size: 14px;
+            }
+        }
+
+        .forecast {
+            padding-left: 16px;
+
+            &-item {
+                width: 148px;
+                &-day,
+                &-temp {
+                    font-size: 14px;
+                }
+
+                &-icon {
+                    width: 48px;
+                    height: 48px;
+                }
+            }
+        }
+    }
+}
+
+
+@media screen and (max-width: 480px) {
+    .main {
+        .head {
+            &-city {
+                line-height: 16px;
+            }
+
+            &-country,
+            &-date {
+                line-height: 16px;
+                margin-top: 10px;
+            }
+        }
+    }
+}
